@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Orchestra Detective — Grade 5</title>
+<style>
+:root{--ink:#172033;--muted:#5c6678;--line:#d8deea;--panel:#f4f6fa;--accent:#344f9b;--accentbg:#e9edfb;--white:#fff}
+*{box-sizing:border-box}body{margin:0;background:#eef1f7;color:var(--ink);font:16px/1.45 system-ui,-apple-system,Segoe UI,sans-serif}
+main{max-width:980px;margin:24px auto;padding:0 16px 40px}.hero{background:#202e57;color:white;padding:22px;border-radius:18px;margin-bottom:16px}.hero h1{margin:0;font-size:clamp(25px,4vw,36px)}.hero p{margin:6px 0 0;color:#e0e6ff}
+nav{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}button,select{font:inherit;border:1px solid var(--line);border-radius:10px;padding:10px 14px;background:white;color:var(--ink);cursor:pointer}button.primary,.active{background:var(--accent);border-color:var(--accent);color:white}button:disabled{opacity:.45;cursor:not-allowed}
+.panel{background:white;border:1px solid var(--line);border-radius:15px;padding:16px;margin:14px 0;box-shadow:0 2px 8px #18274b0a}.panel h2,.panel h3{margin:0 0 10px}.muted,.hint{color:var(--muted);font-size:14px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}.family{border:1px solid var(--line);border-radius:11px;padding:12px}.family h3{font-size:16px;margin:0 0 8px}.chips{display:flex;flex-wrap:wrap;gap:6px}.chip{font-size:13px;background:var(--panel);padding:5px 8px;border-radius:7px}
+.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.row.between{justify-content:space-between}.video{width:min(100%,560px);aspect-ratio:16/9;border:0;border-radius:12px;background:#111}.video-wrap{margin-top:10px}.status{min-height:24px;font-weight:650}.bingo{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.tile{min-height:72px;padding:8px;font-size:13px;font-weight:650;overflow-wrap:anywhere}.tile.marked{background:var(--accentbg);border:2px solid var(--accent);text-decoration:line-through}.tile.free{background:var(--panel);cursor:default}.stats{display:flex;gap:22px;flex-wrap:wrap}.stats strong{font-size:20px}.library{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px}.libitem{display:flex;justify-content:space-between;align-items:center;gap:8px;border:1px solid var(--line);padding:9px;border-radius:9px;font-size:14px}.hidden{display:none!important}a{color:var(--accent)}
+@media(max-width:480px){.tile{min-height:60px;font-size:11px;padding:5px}.panel{padding:12px}}
+</style>
+</head>
+<body><main>
+<header class="hero"><h1>🎼 Orchestra Detective</h1><p>Grade 5 · Instrument listening bingo</p></header>
+<nav><button class="primary" id="studentTab">Student Game</button><button id="teacherTab">Teacher Sound Studio</button></nav>
+<section id="student">
+ <div class="panel"><div class="row between"><h2>Your word bank</h2><span class="muted">Use these names to identify the sound.</span></div>
+  <div class="grid">
+   <div class="family"><h3>Woodwinds</h3><div class="chips"><span class="chip">Flute</span><span class="chip">Oboe</span><span class="chip">Clarinet</span><span class="chip">Bassoon</span><span class="chip">Saxophone</span></div></div>
+   <div class="family"><h3>Brass</h3><div class="chips"><span class="chip">French Horn</span><span class="chip">Trumpet</span><span class="chip">Trombone</span><span class="chip">Tuba</span></div></div>
+   <div class="family"><h3>Strings</h3><div class="chips"><span class="chip">Violin</span><span class="chip">Viola</span><span class="chip">Cello</span><span class="chip">String Bass</span></div></div>
+  </div>
+ </div>
+ <div class="panel">
+  <div class="row between"><h2>Mystery sound</h2><span class="muted" id="round">Round 0</span></div>
+  <p class="hint">Listen carefully. For a true listening challenge, have students turn away from the screen while the clip plays. YouTube may show video as well as sound.</p>
+  <div id="studentVideo" class="hint">Choose “New mystery sound” to begin.</div>
+  <div class="row" style="margin-top:12px"><button class="primary" id="newRound">New mystery sound</button><button id="replay" disabled>Replay</button></div>
+  <label for="answer"><strong>Which instrument did you hear?</strong></label><br>
+  <select id="answer" style="width:100%;margin:8px 0"><option value="">Choose an instrument…</option></select>
+  <button class="primary" id="check" disabled>Check my answer</button>
+  <p class="status" id="feedback" aria-live="polite"></p>
+  <div class="stats"><div>Score<br><strong id="score">0</strong></div><div>Correct<br><strong id="correct">0</strong></div><div>Answered<br><strong id="total">0</strong></div></div>
+ </div>
+ <div class="panel">
+  <div class="row between"><h2>Your bingo card</h2><button id="newCard">New card</button></div>
+  <p class="hint">Tap a square when that instrument is called. Get four in a row, column, or diagonal!</p>
+  <div id="bingo" class="bingo"></div><p class="status" id="bingoStatus" aria-live="polite"></p><button id="clearMarks">Clear marks</button>
+ </div>
+</section>
+<section id="teacher" class="hidden">
+ <div class="panel">
+  <h2>Teacher Sound Studio</h2><p class="hint">Choose an instrument to preview it, or send it to the student game as the next mystery sound. The correct answer is not shown in the student area.</p>
+  <label for="instrument"><strong>Instrument</strong></label><br><select id="instrument" style="width:100%;margin:8px 0"></select>
+  <div class="row"><button class="primary" id="preview">Preview clip</button><button id="assign">Use as mystery sound</button><button id="reveal">Reveal answer</button></div>
+  <p class="status" id="teacherAnswer">Answer hidden.</p><div id="teacherVideo" class="video-wrap"></div>
+ </div>
+ <div class="panel"><h2>Instrument library</h2><div id="library" class="library"></div></div>
+ <div class="panel"><h3>Teacher notes</h3><ul class="hint"><li>For blind listening, play the clip from a teacher-facing screen or have students turn away.</li><li>Use the same short section of each clip when possible.</li><li>These are YouTube embeds; playback requires internet access and may be affected by video embedding settings.</li><li>The saxophone submission is a YouTube Short and may display differently.</li></ul></div>
+</section>
+<p class="hint">This game uses the YouTube clips you supplied. It does not download or store their audio.</p>
+</main>
+<script>
+const instruments=[
+{name:'Flute',family:'Woodwinds',id:'NEzSJW8s-V8',url:'https://youtu.be/NEzSJW8s-V8'},
+{name:'Oboe',family:'Woodwinds',id:'8nNilTdpDiE',url:'https://youtu.be/8nNilTdpDiE'},
+{name:'Clarinet',family:'Woodwinds',id:'kSfEDb1cMAw',url:'https://youtu.be/kSfEDb1cMAw'},
+{name:'Bassoon',family:'Woodwinds',id:'_t2q0lsUl4k',url:'https://youtu.be/_t2q0lsUl4k'},
+{name:'Saxophone',family:'Woodwinds',id:'Y1vc5_L4y9E',url:'https://youtube.com/shorts/Y1vc5_L4y9E'},
+{name:'French Horn',family:'Brass',id:'HuxANPsnFoE',url:'https://youtu.be/HuxANPsnFoE'},
+{name:'Trumpet',family:'Brass',id:'MDXGKx-E-iE',url:'https://youtu.be/MDXGKx-E-iE'},
+{name:'Trombone',family:'Brass',id:'8-fkvWFSeYc',url:'https://youtu.be/8-fkvWFSeYc'},
+{name:'Tuba',family:'Brass',id:'ilt6O8L9Tmg',url:'https://youtu.be/ilt6O8L9Tmg'},
+{name:'Violin',family:'Strings',id:'wh-pBxeHE3U',url:'https://youtu.be/wh-pBxeHE3U'},
+{name:'Viola',family:'Strings',id:'QXi1kyUclhg',url:'https://youtu.be/QXi1kyUclhg'},
+{name:'Cello',family:'Strings',id:'5q7YJhVmE08',url:'https://youtu.be/5q7YJhVmE08'},
+{name:'String Bass',family:'Strings',id:'RYDQmqsW9tA',url:'https://youtu.be/RYDQmqsW9tA'}];
+const $=id=>document.getElementById(id);let current=null,round=0,score=0,correct=0,total=0,card=[],marked=new Set(),answered=false;
+const shuffle=a=>{let b=[...a];for(let i=b.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b};
+function video(item){return `<iframe class="video" title="Instrument sound clip" src="https://www.youtube-nocookie.com/embed/${item.id}?rel=0&playsinline=1" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe><p class="hint"><a href="${item.url}" target="_blank" rel="noopener">Open this clip on YouTube</a> if the player does not load.</p>`}
+function setVideo(target,item){$(target).innerHTML=video(item)}
+function selectTab(which){$('student').classList.toggle('hidden',which!=='student');$('teacher').classList.toggle('hidden',which!=='teacher');$('studentTab').classList.toggle('primary',which==='student');$('teacherTab').classList.toggle('primary',which==='teacher')}
+function updateStats(){$('score').textContent=score;$('correct').textContent=correct;$('total').textContent=total}
+function makeCard(){card=shuffle(instruments.map(x=>x.name)).slice(0,15);card.splice(7,0,'FREE');marked=new Set([7]);drawCard();$('bingoStatus').textContent=''}
+function drawCard(){const b=$('bingo');b.innerHTML='';card.forEach((name,i)=>{const el=document.createElement('button');el.className='tile'+(marked.has(i)?' marked':'')+(name==='FREE'?' free':'');el.textContent=name;el.disabled=name==='FREE';el.onclick=()=>{marked.has(i)?marked.delete(i):marked.add(i);drawCard();checkBingo()};b.appendChild(el)})}
+function checkBingo(){const lines=[[0,1,2,3],[4,5,6,7],[8,9,10,11],[12,13,14,15],[0,4,8,12],[1,5,9,13],[2,6,10,14],[3,7,11,15],[0,5,10,15],[3,6,9,12]];if(lines.some(line=>line.every(i=>marked.has(i))))$('bingoStatus').textContent='🎉 BINGO! Four in a row!'}
+function nextRound(item){current=item;round++;answered=false;$('round').textContent='Round '+round;$('studentVideo').innerHTML=video(item);$('answer').value='';$('check').disabled=false;$('feedback').textContent='';$('replay').disabled=false}
+function populate(){instruments.forEach(x=>{let a=document.createElement('option');a.value=x.name;a.textContent=x.name;$('answer').append(a);let b=document.createElement('option');b.value=x.name;b.textContent=x.name;$('instrument').append(b);let row=document.createElement('div');row.className='libitem';let span=document.createElement('span');span.textContent=x.name+' · '+x.family;let btn=document.createElement('button');btn.textContent='Load';btn.onclick=()=>{$('instrument').value=x.name;setVideo('teacherVideo',x);$('teacherAnswer').textContent='Loaded '+x.name+'.'};row.append(span,btn);$('library').append(row)})}
+$('studentTab').onclick=()=>selectTab('student');$('teacherTab').onclick=()=>selectTab('teacher');
+$('instrument').onchange=()=>{const x=instruments.find(i=>i.name===$('instrument').value);setVideo('teacherVideo',x);$('teacherAnswer').textContent='Answer hidden.'};
+$('preview').onclick=()=>{const x=instruments.find(i=>i.name===$('instrument').value);setVideo('teacherVideo',x)};
+$('assign').onclick=()=>{const x=instruments.find(i=>i.name===$('instrument').value);nextRound(x);$('teacherAnswer').textContent='Mystery sound assigned: '+x.name+'. Students can now answer.';selectTab('student')};
+$('reveal').onclick=()=>{const x=instruments.find(i=>i.name===$('instrument').value);$('teacherAnswer').textContent='Correct answer: '+x.name+' ('+x.family+').'};
+$('newRound').onclick=()=>{const x=shuffle(instruments)[0];$('instrument').value=x.name;setVideo('teacherVideo',x);nextRound(x)};
+$('replay').onclick=()=>{if(current)setVideo('studentVideo',current)};
+$('check').onclick=()=>{if(!current||answered)return;const a=$('answer').value;if(!a){$('feedback').textContent='Choose an instrument first.';return}total++;answered=true;if(a===current.name){correct++;score+=10;$('feedback').textContent='✓ Correct! Great listening!';const i=card.indexOf(current.name);if(i>=0){marked.add(i);drawCard();checkBingo()}}else{$('feedback').textContent='Not quite. The teacher can reveal the answer after everyone has tried.'}updateStats();$('check').disabled=true};
+$('newCard').onclick=makeCard;$('clearMarks').onclick=()=>{marked=new Set([7]);drawCard();$('bingoStatus').textContent=''};
+populate();makeCard();setVideo('teacherVideo',instruments[0]);
+</script>
+</body></html>
